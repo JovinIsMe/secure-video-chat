@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="h-[calc(100vh-8rem)] bg-gray-900 py-6 flex flex-col justify-center sm:py-12">
+    <div class="relative py-3 sm:max-w-xl sm:mx-auto">
+        <div class="relative px-4 py-10 bg-gray-800 mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
+            <div class="max-w-md mx-auto">
+                <div class="divide-y divide-gray-700">
+                    <div class="py-8 text-base leading-6 space-y-4 text-gray-300 sm:text-lg sm:leading-7">
+                        <h2 class="text-2xl font-bold mb-8 text-center text-white">Secure Video Chat</h2>
+
+                        <!-- Join Form -->
+                        <form id="joinForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Username</label>
+                                <input type="text" id="username" name="username" required
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Room ID (optional)</label>
+                                <input type="text" id="roomId" name="roomId"
+                                    class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            </div>
+                            <div class="flex justify-between space-x-4">
+                                <button type="button" id="createRoom"
+                                    class="flex-1 bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Create Room
+                                </button>
+                                <button type="button" id="joinRoom"
+                                    class="flex-1 bg-green-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                    Join Room
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Available Rooms -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-medium text-gray-300 mb-4">Available Rooms</h3>
+                            <div class="space-y-4" id="availableRooms">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('username');
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+        usernameInput.value = savedUsername;
+    }
+
+    document.getElementById('createRoom').addEventListener('click', function() {
+        const username = usernameInput.value.trim();
+        if (!username) {
+            alert('Please enter a username');
+            return;
+        }
+        localStorage.setItem('username', username);
+
+        const formData = new FormData();
+        formData.append('username', username);
+
+        fetch('/create-room', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                window.location.href = `/room/${data.room_id}`;
+            }
+        });
+    });
+
+    document.getElementById('joinRoom').addEventListener('click', function() {
+        const username = usernameInput.value.trim();
+        const roomId = document.getElementById('roomId').value.trim();
+        if (!username || !roomId) {
+            alert('Please enter both username and room ID');
+            return;
+        }
+        localStorage.setItem('username', username);
+        window.location.href = `/room/${roomId}`;
+    });
+
+    // Function to join a specific room from the room list
+    window.joinSpecificRoom = function(roomId) {
+        const username = usernameInput.value.trim();
+        if (!username) {
+            alert('Please enter a username first');
+            return;
+        }
+        localStorage.setItem('username', username);
+        window.location.href = `/room/${roomId}`;
+    };
+
+    // Function to refresh the room list
+    function refreshRoomList() {
+        fetch('/get-rooms')
+            .then(response => response.json())
+            .then(data => {
+                const roomsDiv = document.getElementById('availableRooms');
+                if (Object.keys(data.rooms).length === 0) {
+                    roomsDiv.innerHTML = '<p class="text-gray-500 text-center">No active rooms available</p>';
+                    return;
+                }
+
+                roomsDiv.innerHTML = Object.entries(data.rooms).map(([roomId, roomData]) => `
+                    <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-2">
+                        <div>
+                            <p class="text-sm font-medium text-gray-300">Room: ${roomId}</p>
+                            <p class="text-sm text-gray-400">Users: ${roomData.user_count}</p>
+                        </div>
+                        <button onclick="joinSpecificRoom('${roomId}')"
+                            class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-200 transition-colors">
+                            Join
+                        </button>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                console.error('Error fetching rooms:', error);
+                const roomsDiv = document.getElementById('availableRooms');
+                roomsDiv.innerHTML = '<p class="text-red-500 text-center">Error loading rooms</p>';
+            });
+    }
+
+    // Refresh room list every 5 seconds
+    setInterval(refreshRoomList, 5000);
+    // Initial room list load
+    refreshRoomList();
+});
+</script>
+{% endblock %}
