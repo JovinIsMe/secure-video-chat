@@ -24,7 +24,7 @@
             <div class="flex flex-wrap justify-center gap-4 p-4 backdrop-blur-sm bg-black/30 rounded-2xl">
                 <button id="toggleVideo" class="bg-gray-800 hover:bg-gray-700 p-3 rounded-full focus:outline-none transition-all duration-200">
                     <svg id="videoIcon" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <svg id="videoOffIcon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -36,6 +36,7 @@
                     </svg>
                     <svg id="micOffIcon" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                     </svg>
                 </button>
                 <button id="toggleScreen" class="bg-gray-800 hover:bg-gray-700 p-3 rounded-full focus:outline-none transition-all duration-200">
@@ -46,6 +47,55 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                     </svg>
                 </button>
+                <!-- Video Control Buttons -->
+                <div class="relative group" id="videoControlsDropdown">
+                    <button class="bg-gray-800 hover:bg-gray-700 p-3 rounded-full focus:outline-none transition-all duration-200" title="Video Controls" id="videoControlsBtn">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden" id="videoControlsMenu">
+                        <div class="bg-gray-800 rounded-lg p-2 shadow-lg flex flex-col gap-2 min-w-max">
+                            <button id="zoomIn" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                </svg>
+                                <span>Zoom In</span>
+                            </button>
+                            <button id="zoomOut" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+                                </svg>
+                                <span>Zoom Out</span>
+                            </button>
+                            <button id="panLeft" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                <span>Pan Left</span>
+                            </button>
+                            <button id="panRight" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                                <span>Pan Right</span>
+                            </button>
+                            <button id="panUp" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7 7 7" />
+                                </svg>
+                                <span>Pan Up</span>
+                            </button>
+                            <button id="panDown" class="flex items-center gap-2 text-white px-4 py-2 hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7-7-7" />
+                                </svg>
+                                <span>Pan Down</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <button id="deviceSettings" class="bg-gray-800 hover:bg-gray-700 p-3 rounded-full focus:outline-none transition-all duration-200">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -158,6 +208,150 @@
         if (e.key === 'Enter') {
             e.preventDefault();
             sendMessage();
+        }
+    });
+</script>
+<script>
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    const ZOOM_STEP = 0.1;
+    const PAN_STEP = 50;
+    let panInterval = null;
+
+    // Get video element
+    const remoteVideo = document.getElementById('remoteVideo');
+    remoteVideo.style.transform = 'scale(1) translate(0px, 0px)';
+    remoteVideo.style.transformOrigin = 'center';
+    remoteVideo.style.transition = 'transform 0.1s ease-out';
+
+    // Pan Controls
+    function startPanning(direction) {
+        if (scale <= 1) return; // Only pan when zoomed in
+        
+        // Clear any existing interval
+        if (panInterval) {
+            clearInterval(panInterval);
+        }
+        
+        // Set up continuous panning
+        panInterval = setInterval(() => {
+            switch(direction) {
+                case 'left':
+                    panX = Math.min(panX + PAN_STEP/2, PAN_STEP * 5);
+                    break;
+                case 'right':
+                    panX = Math.max(panX - PAN_STEP/2, -PAN_STEP * 5);
+                    break;
+                case 'up':
+                    panY = Math.min(panY + PAN_STEP/2, PAN_STEP * 5);
+                    break;
+                case 'down':
+                    panY = Math.max(panY - PAN_STEP/2, -PAN_STEP * 5);
+                    break;
+            }
+            updateTransform();
+        }, 50); // Update every 50ms for smooth movement
+    }
+
+    function stopPanning() {
+        if (panInterval) {
+            clearInterval(panInterval);
+            panInterval = null;
+        }
+    }
+
+    // Pan button event listeners
+    document.getElementById('panLeft').addEventListener('mousedown', () => startPanning('left'));
+    document.getElementById('panRight').addEventListener('mousedown', () => startPanning('right'));
+    document.getElementById('panUp').addEventListener('mousedown', () => startPanning('up'));
+    document.getElementById('panDown').addEventListener('mousedown', () => startPanning('down'));
+
+    // Stop panning on mouse up
+    ['panLeft', 'panRight', 'panUp', 'panDown'].forEach(id => {
+        document.getElementById(id).addEventListener('mouseup', stopPanning);
+        document.getElementById(id).addEventListener('mouseleave', stopPanning);
+        // Add touch events for mobile
+        document.getElementById(id).addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startPanning(id.replace('pan', '').toLowerCase());
+        });
+        document.getElementById(id).addEventListener('touchend', (e) => {
+            e.preventDefault();
+            stopPanning();
+        });
+    });
+
+    // Zoom Controls
+    document.getElementById('zoomIn').addEventListener('click', () => {
+        scale = Math.min(scale + ZOOM_STEP, 3);
+        updateTransform();
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', () => {
+        scale = Math.max(scale - ZOOM_STEP, 1);
+        if (scale === 1) {
+            panX = 0;
+            panY = 0;
+        }
+        updateTransform();
+    });
+
+    function updateTransform() {
+        remoteVideo.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
+    }
+
+    // Reset transform when video source changes
+    remoteVideo.addEventListener('loadedmetadata', () => {
+        scale = 1;
+        panX = 0;
+        panY = 0;
+        updateTransform();
+    });
+
+    // Add keyboard controls
+    document.addEventListener('keydown', (e) => {
+        if (scale <= 1) return; // Only pan when zoomed in
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                startPanning('left');
+                break;
+            case 'ArrowRight':
+                startPanning('right');
+                break;
+            case 'ArrowUp':
+                startPanning('up');
+                break;
+            case 'ArrowDown':
+                startPanning('down');
+                break;
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            stopPanning();
+        }
+    });
+</script>
+<script>
+    // Video Controls Dropdown
+    const videoControlsBtn = document.getElementById('videoControlsBtn');
+    const videoControlsMenu = document.getElementById('videoControlsMenu');
+    
+    // Toggle menu only on button click
+    videoControlsBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent click from bubbling to document
+        videoControlsMenu.classList.toggle('hidden');
+        // Toggle active state for the button
+        videoControlsBtn.classList.toggle('bg-gray-700');
+    });
+
+    // Close menu when clicking a menu item
+    videoControlsMenu.addEventListener('click', (e) => {
+        if (e.target.closest('button')) {
+            e.stopPropagation(); // Prevent closing when clicking menu items
         }
     });
 </script>
