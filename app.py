@@ -112,17 +112,23 @@ def on_join_room(data):
         emit('error', {'message': 'Room not found'})
         return
 
-    # Cancel grace period if someone joins
-    if rooms[room].get('grace_period'):
-        rooms[room]['grace_period'] = None
-
     # Add user to room
     join_room(room)
     rooms[room]['users'].add(request.sid)
     connected_users[username] = request.sid
 
-    # Notify others in the room
+    # Get existing users in the room
+    existing_users = [u for u, sid in connected_users.items() if sid in rooms[room]['users'] and sid != request.sid]
+
+    # Notify others in the room about the new user
     emit('user-joined', {'username': username}, room=room, include_self=False)
+
+    # Send existing users to the new user
+    if existing_users:
+        emit('existing-users', {'users': existing_users})
+
+    # Send acknowledgment back to the joining user
+    emit('join-room', {'username': username, 'success': True})
 
 @socketio.on('offer')
 def on_offer(data):

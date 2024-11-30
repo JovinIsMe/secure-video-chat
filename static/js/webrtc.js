@@ -35,8 +35,14 @@ class SecureVideoChat {
         this.pendingCandidates = [];
         this.currentVideoDevice = null;
         this.currentAudioDevice = null;
+        this.remoteUsername = '';
 
         console.log(`WebRTC initialized for user ${username} in room ${roomId}`);
+
+        // Set local username immediately
+        if (username) {
+            document.getElementById('localUsername').textContent = username;
+        }
 
         this.initializeConnection();
         this.setupChatEvents();
@@ -83,13 +89,51 @@ class SecureVideoChat {
     }
 
     setupSocketEvents() {
+        this.socket.on('join-room', (data) => {
+            console.log('Join room acknowledgment:', data);
+            if (data.success) {
+                // Set our local username
+                document.getElementById('localUsername').textContent = data.username;
+            }
+        });
+
         this.socket.on('user-joined', async (data) => {
             console.log('User joined:', data);
-            if (!this.peerConnection || this.peerConnection.connectionState === 'closed') {
-                this.setupPeerConnection();
+            
+            // Show the remote username immediately
+            const remoteUsernameEl = document.getElementById('remoteUsername');
+            remoteUsernameEl.textContent = data.username;
+            remoteUsernameEl.style.display = 'block';
+            
+            // Hide the placeholder
+            document.getElementById('remoteVideoPlaceholder').style.display = 'none';
+            
+            // Setup WebRTC connection
+            if (!this.peerConnection) {
+                await this.createPeerConnection();
             }
             this.isInitiator = true;
             await this.createAndSendOffer();
+        });
+
+        this.socket.on('existing-users', (data) => {
+            console.log('Existing users:', data);
+            if (data.users && data.users.length > 0) {
+                // Show the first existing user's username
+                const remoteUsernameEl = document.getElementById('remoteUsername');
+                remoteUsernameEl.textContent = data.users[0];
+                remoteUsernameEl.style.display = 'block';
+                document.getElementById('remoteVideoPlaceholder').style.display = 'none';
+            }
+        });
+
+        this.socket.on('user-disconnected', () => {
+            console.log('User disconnected');
+            const remoteUsernameEl = document.getElementById('remoteUsername');
+            remoteUsernameEl.textContent = '';
+            remoteUsernameEl.style.display = 'none';
+            document.getElementById('remoteVideoPlaceholder').style.display = 'flex';
+            this.handlePeerDisconnection();
         });
 
         this.socket.on('connect_error', (error) => {
@@ -156,11 +200,6 @@ class SecureVideoChat {
             } else {
                 await this.handleIceCandidate(data.candidate);
             }
-        });
-
-        this.socket.on('user-disconnected', () => {
-            console.log('User disconnected');
-            this.handlePeerDisconnection();
         });
 
         // Chat message handler
@@ -703,3 +742,10 @@ class SecureVideoChat {
         }, 5000);
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const localUsername = localStorage.getItem('username');
+    if (localUsername) {
+        document.getElementById('localUsername').textContent = localUsername;
+    }
+});
