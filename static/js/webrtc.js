@@ -92,6 +92,30 @@ class SecureVideoChat {
             await this.createAndSendOffer();
         });
 
+        this.socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            this.showError('Connection error. Redirecting to home page...');
+            setTimeout(() => window.location.href = '/', 2000);
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+            this.showError('Connection lost. Redirecting to home page...');
+            setTimeout(() => window.location.href = '/', 2000);
+        });
+
+        this.socket.on('room_closed', () => {
+            console.log('Room has been closed');
+            this.showError('Room has been closed. Redirecting to home page...');
+            setTimeout(() => window.location.href = '/', 2000);
+        });
+
+        this.socket.on('error', (data) => {
+            console.error('Socket error:', data.message);
+            this.showError(data.message);
+            setTimeout(() => window.location.href = '/', 2000);
+        });
+
         this.socket.on('offer', async (data) => {
             console.log('Received offer');
             if (!this.peerConnection || this.peerConnection.connectionState === 'closed') {
@@ -145,6 +169,11 @@ class SecureVideoChat {
             console.log('Current username:', this.username);
             console.log('Message username:', data.messageData.username);
             this.displayChatMessage(data.messageData, false);
+        });
+
+        this.socket.on('room-not-found', () => {
+            console.log('Room not found');
+            window.location.href = '/';
         });
     }
 
@@ -650,5 +679,27 @@ class SecureVideoChat {
         this.isScreenSharing = false;
         this.originalStream = null;
     }
-}
 
+    showError(message) {
+        const errorContainer = document.createElement('div');
+        errorContainer.className = 'fixed top-20 right-4 z-50 flash-message px-4 py-3 rounded-lg shadow-lg bg-red-500 text-white';
+        errorContainer.innerHTML = `
+            <div class="flex items-center">
+                <div class="py-1">
+                    <svg class="h-6 w-6 text-white mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="font-bold">${message}</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(errorContainer);
+        
+        // Remove the error message after animation
+        setTimeout(() => {
+            errorContainer.remove();
+        }, 5000);
+    }
+}

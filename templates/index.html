@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         usernameInput.value = savedUsername;
     }
 
-    document.getElementById('createRoom').addEventListener('click', function() {
+    document.getElementById('createRoom').addEventListener('click', async function() {
         const username = usernameInput.value.trim();
         if (!username) {
             alert('Please enter a username');
@@ -65,40 +65,73 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         formData.append('username', username);
 
-        fetch('/create-room', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
+        try {
+            const response = await fetch('/create-room', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
                 window.location.href = `/room/${data.room_id}`;
+            } else {
+                alert(data.error || 'Failed to create room. Please try again.');
             }
-        });
+        } catch (error) {
+            console.error('Error creating room:', error);
+            alert('Failed to create room. Please try again.');
+        }
     });
 
-    document.getElementById('joinRoom').addEventListener('click', function() {
+    document.getElementById('joinRoom').addEventListener('click', async function() {
         const username = usernameInput.value.trim();
         const roomId = document.getElementById('roomId').value.trim();
         if (!username || !roomId) {
             alert('Please enter both username and room ID');
             return;
         }
-        localStorage.setItem('username', username);
-        window.location.href = `/room/${roomId}`;
+
+        try {
+            const response = await fetch('/get-rooms');
+            const data = await response.json();
+            
+            if (!data.rooms[roomId]) {
+                alert('Room not found. Please check the room ID and try again.');
+                return;
+            }
+            
+            localStorage.setItem('username', username);
+            window.location.href = `/room/${roomId}`;
+        } catch (error) {
+            console.error('Error checking room:', error);
+            alert('Error checking room status. Please try again.');
+        }
     });
 
     // Function to join a specific room from the room list
-    window.joinSpecificRoom = function(roomId) {
+    window.joinSpecificRoom = async function(roomId) {
         const username = usernameInput.value.trim();
         if (!username) {
             alert('Please enter a username first');
             return;
         }
-        localStorage.setItem('username', username);
-        window.location.href = `/room/${roomId}`;
+
+        try {
+            const response = await fetch('/get-rooms');
+            const data = await response.json();
+            
+            if (!data.rooms[roomId]) {
+                alert('Room no longer exists. Please choose another room.');
+                refreshRoomList();
+                return;
+            }
+            
+            localStorage.setItem('username', username);
+            window.location.href = `/room/${roomId}`;
+        } catch (error) {
+            console.error('Error checking room:', error);
+            alert('Error checking room status. Please try again.');
+        }
     };
 
     // Function to refresh the room list

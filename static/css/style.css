@@ -182,3 +182,36 @@
         opacity: 1;
     }
 }
+
+/* Flash Messages */
+.flash-message {
+    animation: slideIn 0.5s ease-out forwards, fadeOut 0.5s ease-in forwards 4.5s;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.flash-message {
+    animation-fill-mode: forwards;
+}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import secrets
 import uuid
@@ -31,10 +31,12 @@ def cleanup_empty_rooms():
     
     for room_id, room_data in rooms.items():
         if not room_data['users']:
-            if 'grace_period' not in room_data or not room_data['grace_period']:
+            if room_data.get('grace_period') is None:
                 start_room_grace_period(room_id)
             elif (current_time - room_data['grace_period']).total_seconds() > 10:
                 empty_rooms.append(room_id)
+                # Notify any remaining clients that the room is closed
+                emit('room_closed', room=room_id, namespace='/')
     
     for room_id in empty_rooms:
         del rooms[room_id]
@@ -65,51 +67,61 @@ def create_room():
     if not username:
         return jsonify({'error': 'Username is required'}), 400
 
-    room_id = request.form.get('room_id')
-    if not room_id:
-        room_id = str(uuid.uuid4())
-
-    if room_id not in rooms:
-        rooms[room_id] = {
-            'users': set(),
-            'host': username,
-            'pending_requests': set(),
-            'created_at': datetime.now(),
-            'grace_period': None
-        }
-
+    room_id = str(uuid.uuid4())
+    rooms[room_id] = {
+        'users': set(),
+        'host': username,
+        'pending_requests': set(),
+        'created_at': datetime.now(),
+        'grace_period': None
+    }
     return jsonify({'room_id': room_id})
 
 @app.route('/room/<room_id>')
 def room(room_id):
-    cleanup_empty_rooms()
+    # Check if room exists first
     if room_id not in rooms:
-        return "Room not found", 404
+        flash('Room not found or has been closed. Please create or join another room.', 'error')
+        return redirect(url_for('index'))
+    
+    # Don't clean up rooms that are being actively joined
+    if room_id not in request.path:
+        cleanup_empty_rooms()
+    
+    # If room is in grace period, cancel it when someone tries to join
+    if rooms[room_id].get('grace_period'):
+        rooms[room_id]['grace_period'] = None
+    
+    # Check if room is active
+    if not rooms[room_id]['users'] and (datetime.now() - rooms[room_id]['created_at']).total_seconds() > 300:
+        flash('This room has been inactive for too long. Please create or join another room.', 'error')
+        return redirect(url_for('index'))
+        
     return render_template('room.html', room_id=room_id)
 
 @socketio.on('join-room')
 def on_join_room(data):
     room = data.get('room')
     username = data.get('username')
-
+    
     if not room or not username:
+        emit('error', {'message': 'Room and username are required'})
+        return
+        
+    if room not in rooms:
+        emit('error', {'message': 'Room not found'})
         return
 
-    # Reset grace period when someone joins
-    if room in rooms and 'grace_period' in rooms[room]:
+    # Cancel grace period if someone joins
+    if rooms[room].get('grace_period'):
         rooms[room]['grace_period'] = None
 
+    # Add user to room
     join_room(room)
-    rooms[room] = rooms.get(room, {
-        'users': set(),
-        'host': None,
-        'pending_requests': set(),
-        'created_at': datetime.now(),
-        'grace_period': None
-    })
     rooms[room]['users'].add(request.sid)
     connected_users[username] = request.sid
 
+    # Notify others in the room
     emit('user-joined', {'username': username}, room=room, include_self=False)
 
 @socketio.on('offer')
