@@ -36,6 +36,8 @@ class SecureVideoChat {
         this.currentVideoDevice = null;
         this.currentAudioDevice = null;
 
+        console.log(`WebRTC initialized for user ${username} in room ${roomId}`);
+
         this.initializeConnection();
         this.setupChatEvents();
         this.setupMediaControls();
@@ -139,10 +141,10 @@ class SecureVideoChat {
 
         // Chat message handler
         this.socket.on('chat-message', (data) => {
-            console.log('Received chat message:', data);
-            if (data.messageData && data.messageData.username !== this.username) {
-                this.displayChatMessage(data.messageData, false);
-            }
+            console.log('Received chat message event:', data);
+            console.log('Current username:', this.username);
+            console.log('Message username:', data.messageData.username);
+            this.displayChatMessage(data.messageData, false);
         });
     }
 
@@ -169,9 +171,11 @@ class SecureVideoChat {
         this.peerConnection.ontrack = (event) => {
             console.log('Received remote track:', event.track.kind);
             const remoteVideo = document.getElementById('remoteVideo');
+            const remoteVideoPlaceholder = document.getElementById('remoteVideoPlaceholder');
             if (remoteVideo.srcObject !== event.streams[0]) {
                 console.log('Setting remote stream');
                 remoteVideo.srcObject = event.streams[0];
+                remoteVideoPlaceholder.style.display = 'none';
                 this.remoteStream = event.streams[0];
             }
         };
@@ -253,8 +257,12 @@ class SecureVideoChat {
 
     handlePeerDisconnection() {
         const remoteVideo = document.getElementById('remoteVideo');
-        remoteVideo.srcObject = null;
-        document.getElementById('remoteUsername').classList.add('hidden');
+        const remoteVideoPlaceholder = document.getElementById('remoteVideoPlaceholder');
+        if (remoteVideo.srcObject) {
+            remoteVideo.srcObject.getTracks().forEach(track => track.stop());
+            remoteVideo.srcObject = null;
+        }
+        remoteVideoPlaceholder.style.display = 'flex';
 
         if (this.peerConnection) {
             this.peerConnection.close();
@@ -299,20 +307,24 @@ class SecureVideoChat {
             timestamp: new Date().toISOString()
         };
 
-        console.log('Sending chat message:', messageData);
+        console.log('Preparing to send chat message:', messageData);
+        console.log('Current room:', this.roomId);
 
-        // Emit the message
+        // Display own message first
+        this.displayChatMessage(messageData, true);
+
+        // Then emit the message
+        console.log('Emitting chat message to server');
         this.socket.emit('chat-message', {
             room: this.roomId,
             messageData: messageData
         });
-
-        // Display own message
-        this.displayChatMessage(messageData, true);
+        console.log('Chat message emitted');
     }
 
     displayChatMessage(data, isOwnMessage = false) {
-        console.log('Displaying message:', data, 'isOwnMessage:', isOwnMessage);
+        console.log('Displaying chat message:', data);
+        console.log('Is own message:', isOwnMessage);
 
         const chatMessages = document.getElementById('chat-messages');
         const messageDiv = document.createElement('div');
