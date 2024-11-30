@@ -1,99 +1,127 @@
 # Secure Video Chat
 
-A secure, encrypted, peer-to-peer video chat application built with WebRTC and Flask.
+A modern, feature-rich video chat application built with WebRTC, Flask, and Socket.IO. This application provides a secure, real-time video communication platform with advanced video controls and chat functionality.
 
 ## Features
 
-- 🔒 End-to-end encrypted video calls
-- 🎥 High-quality video and audio streaming
-- 🖥️ Screen sharing capability
-- 🔐 Peer-to-peer connection (data never passes through servers)
-- 📱 Responsive design for all devices
-- 🔗 Easy room sharing with copy link feature
-- 🎛️ Audio/Video controls
-- ⚡ Low latency communication
+### Video Communication
+- Real-time video and audio streaming using WebRTC
+- Screen sharing capability
+- Device selection for camera and microphone
+- Video/Audio mute controls
 
-## Security Features
+### Advanced Video Controls
+- Dynamic zoom controls (1x to 3x zoom)
+- Smooth video panning with multiple input methods:
+  - Mouse: Click and hold directional buttons
+  - Touch: Touch and hold for mobile devices
+  - Keyboard: Arrow keys for precise control
+- Game-like D-pad style controller interface
 
-- WebRTC's built-in encryption (DTLS-SRTP) for all media streams
-- Peer-to-peer architecture ensures data privacy
-- No data storage on servers
-- Secure room creation with random tokens
-- CSRF protection
+### Chat Features
+- Real-time text chat alongside video
+- Username-based identification
+- Message timestamps
+- Persistent chat history during session
 
-## Prerequisites
+### User Interface
+- Modern, responsive design using Tailwind CSS
+- Adaptive layout for both desktop and mobile devices
+- Intuitive control buttons with visual feedback
+- Clean, minimalist aesthetic
 
-- Python 3.8 or higher
-- pip (Python package manager)
+## Technical Stack
+
+### Frontend
+- HTML5/CSS3/JavaScript
+- Tailwind CSS for styling
+- Socket.IO client for real-time communication
+- WebRTC for peer-to-peer video streaming
+
+### Backend
+- Flask (Python web framework)
+  - Serves as the web server for delivering HTML, CSS, and JavaScript
+  - Acts as a signaling server for WebRTC peer connection setup
+  - Manages room creation and user sessions
+  - Routes users to appropriate video chat rooms
+- Socket.IO for real-time communication
+  - Handles real-time message exchange for WebRTC signaling
+  - Manages chat functionality between users
+- STUN/TURN servers for NAT traversal
+
+## Getting Started
+
+### Prerequisites
+- Python 3.8+
 - Modern web browser with WebRTC support
 
-## Installation
+### Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/JovinIsMe/secure-video-chat.git
 cd secure-video-chat
 ```
 
-2. Create a virtual environment and activate it:
+2. Create and activate a virtual environment:
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install the required packages:
+3. Install Python dependencies:
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
-4. Set up environment variables:
+4. Start the application:
 ```bash
-export FLASK_APP=app.py
-export FLASK_ENV=development
+python3 app.py
 ```
 
-5. Run the application:
-```bash
-flask run
-```
-
-The application will be available at `http://localhost:5000`
+5. Visit `http://localhost:5000` in your browser
 
 ## Usage
 
-1. Open the application in your browser
-2. Click "Create New Room" to start a new video chat room
-3. Share the room link with another person
-4. When they join, the video call will automatically begin
-5. Use the control buttons to:
-   - Toggle video on/off
-   - Toggle audio on/off
-   - Share your screen
-   - Leave the call
+1. Enter your username on the home page
+2. Create or join a room
+3. Allow camera and microphone access when prompted
+   - You may need to whitelist the app on Chrome `chrome://flags/` for `Insecure origins treated as secure` so it can allow the camera and microphone usage
+4. Use the control buttons to:
+   - Toggle video/audio
+   - Share screen
+   - Access video controls (zoom/pan)
+   - Change input devices
+   - Send chat messages
 
-## Development
+### Video Control Features
+- Click the video controls button to access zoom and pan options
+- Use the zoom buttons to adjust video size (100% to 300%)
+- Pan the zoomed video using:
+  - On-screen D-pad buttons
+  - Keyboard arrow keys
+  - Touch and drag (mobile)
 
-The application structure is as follows:
+## Security Features
+- Secure WebRTC connections
+- Random room IDs
+- No permanent storage of video/audio data
+- Client-side security measures
 
-```
-secure-video-chat/
-├── app.py              # Main Flask application
-├── requirements.txt    # Python dependencies
-├── static/
-│   ├── css/
-│   │   └── style.css  # Custom styles
-│   └── js/
-│       └── webrtc.js  # WebRTC implementation
-└── templates/
-    ├── base.html      # Base template
-    ├── index.html     # Home page
-    └── room.html      # Video chat room
-```
+## Browser Support
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge (Chromium-based)
 
 ## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit pull requests.
 
 ## License
-
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+- WebRTC project for the underlying technology
+- Flask team for the web framework
+- Socket.IO team for real-time communication capabilities
+- Tailwind CSS for the UI framework
