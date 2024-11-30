@@ -652,8 +652,3 @@ class SecureVideoChat {
     }
 }
 
-// Initialize the video chat when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const roomId = window.location.pathname.split('/').pop();
-    new SecureVideoChat(roomId);
-});
