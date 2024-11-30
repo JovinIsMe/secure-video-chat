@@ -99,15 +99,15 @@ class SecureVideoChat {
 
         this.socket.on('user-joined', async (data) => {
             console.log('User joined:', data);
-            
+
             // Show the remote username immediately
             const remoteUsernameEl = document.getElementById('remoteUsername');
             remoteUsernameEl.textContent = data.username;
             remoteUsernameEl.style.display = 'block';
-            
+
             // Hide the placeholder
             document.getElementById('remoteVideoPlaceholder').style.display = 'none';
-            
+
             // Setup WebRTC connection
             if (!this.peerConnection) {
                 await this.createPeerConnection();
@@ -698,7 +698,7 @@ class SecureVideoChat {
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => track.stop());
         }
-        
+
         // Restore original camera stream
         if (this.originalStream) {
             this.localStream = this.originalStream;
@@ -735,7 +735,7 @@ class SecureVideoChat {
             </div>
         `;
         document.body.appendChild(errorContainer);
-        
+
         // Remove the error message after animation
         setTimeout(() => {
             errorContainer.remove();
@@ -749,3 +749,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('localUsername').textContent = localUsername;
     }
 });
+

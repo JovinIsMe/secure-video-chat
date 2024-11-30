@@ -98,7 +98,7 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- Remote video placeholder -->
         <div id="remoteVideoPlaceholder" class="absolute inset-0 flex items-center justify-center bg-gray-900">
             <div class="text-center">
@@ -283,12 +283,12 @@
     // Pan Controls
     function startPanning(direction) {
         if (scale <= 1) return; // Only pan when zoomed in
-        
+
         // Clear any existing interval
         if (panInterval) {
             clearInterval(panInterval);
         }
-        
+
         // Set up continuous panning
         panInterval = setInterval(() => {
             switch(direction) {
@@ -367,7 +367,7 @@
     // Add keyboard controls
     document.addEventListener('keydown', (e) => {
         if (scale <= 1) return; // Only pan when zoomed in
-        
+
         switch(e.key) {
             case 'ArrowLeft':
                 startPanning('left');
@@ -394,7 +394,7 @@
     // Video Controls Dropdown
     const videoControlsBtn = document.getElementById('videoControlsBtn');
     const videoControlsMenu = document.getElementById('videoControlsMenu');
-    
+
     // Toggle menu only on button click
     videoControlsBtn.addEventListener('click', (e) => {
         e.stopPropagation(); // Prevent click from bubbling to document
@@ -411,3 +411,4 @@
     });
 </script>
 {% endblock %}
+

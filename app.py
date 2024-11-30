@@ -20,7 +20,7 @@ def check_room_grace_period(room_id):
     """Check if room's grace period has expired (10 seconds)"""
     if room_id not in rooms or 'grace_period' not in rooms[room_id] or not rooms[room_id]['grace_period']:
         return False
-    
+
     grace_period = rooms[room_id]['grace_period']
     return (datetime.now() - grace_period).total_seconds() <= 10
 
@@ -28,7 +28,7 @@ def cleanup_empty_rooms():
     """Clean up rooms that are empty and have exceeded their grace period"""
     current_time = datetime.now()
     empty_rooms = []
-    
+
     for room_id, room_data in rooms.items():
         if not room_data['users']:
             if room_data.get('grace_period') is None:
@@ -37,7 +37,7 @@ def cleanup_empty_rooms():
                 empty_rooms.append(room_id)
                 # Notify any remaining clients that the room is closed
                 emit('room_closed', room=room_id, namespace='/')
-    
+
     for room_id in empty_rooms:
         del rooms[room_id]
 
@@ -83,31 +83,31 @@ def room(room_id):
     if room_id not in rooms:
         flash('Room not found or has been closed. Please create or join another room.', 'error')
         return redirect(url_for('index'))
-    
+
     # Don't clean up rooms that are being actively joined
     if room_id not in request.path:
         cleanup_empty_rooms()
-    
+
     # If room is in grace period, cancel it when someone tries to join
     if rooms[room_id].get('grace_period'):
         rooms[room_id]['grace_period'] = None
-    
+
     # Check if room is active
     if not rooms[room_id]['users'] and (datetime.now() - rooms[room_id]['created_at']).total_seconds() > 300:
         flash('This room has been inactive for too long. Please create or join another room.', 'error')
         return redirect(url_for('index'))
-        
+
     return render_template('room.html', room_id=room_id)
 
 @socketio.on('join-room')
 def on_join_room(data):
     room = data.get('room')
     username = data.get('username')
-    
+
     if not room or not username:
         emit('error', {'message': 'Room and username are required'})
         return
-        
+
     if room not in rooms:
         emit('error', {'message': 'Room not found'})
         return
@@ -151,7 +151,7 @@ def handle_chat_message(data):
     print(f"Received chat message in room {room}: {data['messageData']}")
     print(f"Current room users: {rooms[room]['users'] if room in rooms else 'Room not found'}")
     print(f"Sender SID: {request.sid}")
-    
+
     if room in rooms:
         # Broadcast the message data to all users in the room except the sender
         print(f"Broadcasting message to room {room}")
@@ -198,3 +198,4 @@ def handle_disconnect():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+

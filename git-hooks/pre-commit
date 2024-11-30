@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to safely print colored output
+print_message() {
+    local color=$1
+    local message=$2
+    echo -e "${color}${message}${NC}"
+}
+
+print_message "$BLUE" "========================================"
+print_message "$BLUE" "Starting pre-commit hook checks..."
+print_message "$BLUE" "========================================"
+
+# Get list of staged files
+print_message "$YELLOW" "Getting list of staged files..."
+files=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$files" ]; then
+    print_message "$YELLOW" "No files staged for commit. Skipping checks."
+    exit 0
+fi
+
+# Store the initial state of the repository
+initial_state=$(git status --porcelain)
+
+# Run cleanup whitespace script on staged files
+print_message "$YELLOW" "Running whitespace cleanup script..."
+cleanup_script="./scripts/cleanup_whitespace.sh"
+
+if [ ! -x "$cleanup_script" ]; then
+    print_message "$RED" "Error: Cleanup script not found or not executable at $cleanup_script"
+    exit 1
+fi
+
+# Run cleanup script on each staged file
+changes_detected=0
+for file in $files; do
+    "$cleanup_script" "$file"
+    if [ $? -ne 0 ]; then
+        print_message "$RED" "Error: Cleanup script failed on $file"
+        exit 1
+    fi
+done
+
+# Check if any files were modified by the cleanup script
+current_state=$(git status --porcelain)
+if [ "$initial_state" != "$current_state" ]; then
+    print_message "$RED" "✗ Whitespace cleanup made changes to your files."
+    print_message "$RED" "Please stage the changes and try committing again:"
+    print_message "$YELLOW" "Modified files:"
+    git status --porcelain | grep "^.M" | cut -c4- | while read -r file; do
+        print_message "$YELLOW" "  $file"
+    done
+    print_message "$BLUE" "To fix this:"
+    print_message "$BLUE" "1. Review the changes"
+    print_message "$BLUE" "2. Stage them with: git add <files>"
+    print_message "$BLUE" "3. Try committing again"
+    exit 1
+fi
+
+print_message "$GREEN" "✓ Whitespace check passed - no changes needed"
+print_message "$BLUE" "========================================"
+exit 0
+

@@ -23,3 +23,4 @@ def create_video_camera_favicon():
 
 if __name__ == '__main__':
     create_video_camera_favicon()
+

@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             });
             const data = await response.json();
-            
+
             if (response.ok) {
                 window.location.href = `/room/${data.room_id}`;
             } else {
@@ -94,12 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('/get-rooms');
             const data = await response.json();
-            
+
             if (!data.rooms[roomId]) {
                 alert('Room not found. Please check the room ID and try again.');
                 return;
             }
-            
+
             localStorage.setItem('username', username);
             window.location.href = `/room/${roomId}`;
         } catch (error) {
@@ -119,13 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch('/get-rooms');
             const data = await response.json();
-            
+
             if (!data.rooms[roomId]) {
                 alert('Room no longer exists. Please choose another room.');
                 refreshRoomList();
                 return;
             }
-            
+
             localStorage.setItem('username', username);
             window.location.href = `/room/${roomId}`;
         } catch (error) {
@@ -172,3 +172,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

@@ -115,7 +115,35 @@ python3 app.py
 - Edge (Chromium-based)
 
 ## Contributing
-Contributions are welcome! Please feel free to submit pull requests.
+
+### Development Setup
+
+Set up Git hooks (required for all contributors):
+```bash
+./setup-hooks.sh
+```
+This will install pre-commit hooks that:
+- Clean up whitespace in files
+- Ensure consistent file endings
+- Skip processing of binary and asset files
+
+### Git Hooks
+
+This project uses Git hooks to maintain code quality and consistency. The hooks are stored in the `git-hooks` directory and are installed by running `setup-hooks.sh`.
+
+#### Pre-commit Hook
+The pre-commit hook automatically runs before each commit and:
+- Cleans up whitespace in staged files
+- Ensures files end with a single newline
+- Skips processing of:
+  - Binary files
+  - Image assets (*.ico, *.png, *.jpg, *.jpeg, *.gif, *.svg, *.webp)
+  - Audio files (*.mp3, *.wav, *.ogg)
+  - Video files (*.mp4)
+  - Font files (*.ttf, *.woff, *.woff2, *.eot)
+  - Asset directories (static/img, static/assets, public/img, public/assets)
+
+The hook ensures all contributors maintain consistent file formatting without having to think about it.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
@@ -125,3 +153,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Flask team for the web framework
 - Socket.IO team for real-time communication capabilities
 - Tailwind CSS for the UI framework
+

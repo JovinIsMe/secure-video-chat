@@ -186,3 +186,4 @@ module.exports = {
   disableLog: disableLog,
   disableWarnings: disableWarnings
 };
+
